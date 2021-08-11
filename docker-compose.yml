@@ -1,15 +1,20 @@
-version: "3"
-services: 
+version: '2'
+services:
   coursesapi:
     container_name: coursesapi
-    restart: always
     build: .
-    ports: 
-      - "8000:8000"
-    links: 
+    restart: always
+    ports:
+      - '8000:8000'
+    links:
       - mongo
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_DB=mongodb://mongo:27017/coursesApi
+      - PORT=8000
   mongo:
     container_name: mongo
     image: mongo
-    ports: 
-      - "27018:27018"
+    ports:
+      - '27017:27017'

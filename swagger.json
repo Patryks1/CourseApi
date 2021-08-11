@@ -5,7 +5,6 @@
     "title": "Stats Service",
     "description": "Provides persistence of stats"
   },
-  "host": "localhost:3000",
   "basePath": "/",
   "schemes": ["http"],
   "consumes": ["application/json"],
