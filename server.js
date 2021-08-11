@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
+import routes from "./routes";
 
 const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
