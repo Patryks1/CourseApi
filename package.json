@@ -1,0 +1,33 @@
+{
+  "name": "course-api",
+  "version": "1.0.0",
+  "description": "Backend test",
+  "author": "Patryk Slowinski",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --experimental-modules --es-module-specifier-resolution=node app.js",
+    "dev": "nodemon --experimental-modules --es-module-specifier-resolution=node ./app.js",
+    "test": "jest",
+    "test-watch": "jest --watchAll"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "1.15.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.13.6",
+    "swagger-ui-express": "^4.1.6"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.15.0",
+    "jest": "^27.0.6",
+    "nodemon": "^1.11.0",
+    "supertest": "^6.1.4"
+  },
+  "type": "module",
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  }
+}
