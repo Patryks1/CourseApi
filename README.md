@@ -2,6 +2,8 @@
 
 Backend coding test - 
 
+Assumptions made: [Go to ASSUMPTIONS.md](ASSUMPTIONS.md)
+
 To deploy locally use the below commands in sequance while in root directory
 ```
 yarn install 
