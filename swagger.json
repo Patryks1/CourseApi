@@ -10,6 +10,39 @@
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
+    "/courses/": {
+      "post": {
+        "description": "Creates a new course and returns its Id",
+        "parameters": [
+          {
+            "in": "header",
+            "description": "Identifies the user",
+            "name": "X-User-Id",
+            "type": "string",
+            "format": "uuid",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "course information",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/courses/{courseId}": {
       "post": {
         "description": "Persists a session study event",

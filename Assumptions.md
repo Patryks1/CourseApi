@@ -1,0 +1,1 @@
+- I assume that courses will have its own properties so i normalized it out into its own scheme

@@ -15,7 +15,8 @@
     "body-parser": "1.15.0",
     "express": "^4.17.1",
     "mongoose": "^5.13.6",
-    "swagger-ui-express": "^4.1.6"
+    "swagger-ui-express": "^4.1.6",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.15.0",

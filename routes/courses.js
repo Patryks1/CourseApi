@@ -1,26 +1,41 @@
 import { Router } from 'express';
-import { Session } from '../models';
+import { Session, Course } from '../models';
+import { dictionary } from '../dictionary';
+import { isValidUUID } from '../helper/validation';
 
 const router = Router();
 
-const uuidRegEx =
-  /[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/;
+router.post('/', async (req, res) => {
+  const { name } = req.body;
 
-const isValidUUID = (val) => {
-  return uuidRegEx.test(val);
-};
+  if (!name) {
+    return res.status(400).json({
+      detail: dictionary.missingRequiredData,
+    });
+  }
 
-const dictionary = {
-  missingRequiredData: 'Missing required data',
-  invalidCourseOrSessionId: 'Invalid courseId or sessionId',
-  invalidCourseId: 'Invalid courseId',
-  courseIdDoesNotExist: 'courseId does not exist',
-  courseIdoOrSessionIdDoesNotExist: 'courseId or sessionId does not exist',
-  saved: 'Saved!',
-  failedToSaveInDatabase: 'Failed to save session in database',
-};
+  // TODO: Check if course name already exists
 
-router.post('/:courseId', (req, res) => {
+  const courseDocument = new Course({
+    name: name,
+  });
+
+  return courseDocument
+    .save()
+    .then((document) => {
+      return res.status(201).json({
+        detail: dictionary.saved,
+        id: document._id
+      });
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        detail: dictionary.failedToSaveInDatabase,
+      });
+    });
+});
+
+router.post('/:courseId', async (req, res) => {
   const { sessionId, totalModulesStudied, averageScore, timeStudied } =
     req.body;
   const { courseId } = req.params;
@@ -37,9 +52,17 @@ router.post('/:courseId', (req, res) => {
     });
   }
 
+  const courseDocument = await Course.findById(courseId);
+
+  if (!courseDocument) {
+    return res.status(404).json({
+      detail: dictionary.courseDoesNotExist,
+    });
+  }
+
   const sessionDocument = new Session({
-    sessionId: sessionId,
-    courseId: courseId,
+    _id: sessionId,
+    courseId: courseDocument._id,
     totalModulesStudied: totalModulesStudied,
     averageScore: averageScore,
     timeStudied: timeStudied,
@@ -53,6 +76,13 @@ router.post('/:courseId', (req, res) => {
       });
     })
     .catch((err) => {
+      // Duplicate uuid error code
+      if (err.code === 11000) {
+        return res.status(409).json({
+          detail: dictionary.recordAlreadyExists,
+        });
+      }
+
       return res.status(500).json({
         detail: dictionary.failedToSaveInDatabase,
       });
@@ -106,8 +136,8 @@ router.get('/:courseId/sessions/:sessionId', async (req, res) => {
   }
 
   const session = await Session.findOne({
+    _id: sessionId,
     courseId: courseId,
-    sessionId: sessionId,
   });
 
   if (!session) {
@@ -117,7 +147,7 @@ router.get('/:courseId/sessions/:sessionId', async (req, res) => {
   }
 
   const responsePayload = {
-    sessionId: session.sessionId,
+    sessionId: session._id,
     totalModulesStudied: session.totalModulesStudied,
     averageScore: session.averageScore,
     timeStudied: session.timeStudied,

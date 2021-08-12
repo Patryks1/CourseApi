@@ -1,6 +1,6 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
-import { Session } from '../models';
+import { Session, Course } from '../models';
 import app from '../server';
 
 const courseId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
@@ -14,13 +14,20 @@ const createSession = async (
   timeStudied
 ) => {
   await Session.create({
-    sessionId: sessionId,
+    _id: sessionId,
     courseId: courseId,
     totalModulesStudied: totalModulesStudied,
     averageScore: averageScore,
     timeStudied: timeStudied,
   });
 };
+
+const createCourse = async (name) => {
+  await Course.create({
+    _id: courseId,
+    name: name
+  });
+}
 
 beforeEach((done) => {
   mongoose.connect(
@@ -85,13 +92,8 @@ describe('/courses', () => {
 
   describe('GET /courses/:courseId/sessions/:sessionId', () => {
     it('should return status 200 when course exists and session exists', async () => {
-      await createSession(
-        sessionId,
-        courseId,
-        5,
-        26,
-        22
-      );
+      await createCourse("testCourse");
+      await createSession(sessionId, courseId, 5, 26, 22);
 
       const { status, body } = await request(app).get(
         `/courses/${courseId}/sessions/${sessionId}`
@@ -107,13 +109,13 @@ describe('/courses', () => {
     it('should return status 404 when courseId does not exist', async () => {
       await createSession(
         sessionId,
-        "3fa85f64-5717-4562-123c-2c963f66a2a1",
+        '3fa85f64-5717-4562-123c-2c963f66a2a1',
         5,
         26,
         22
       );
 
-      const {status, body } = await request(app).get(
+      const { status, body } = await request(app).get(
         `/courses/${courseId}/sessions/${sessionId}`
       );
 
@@ -123,14 +125,14 @@ describe('/courses', () => {
 
     it('should return status 404 when sessionId does not exist', async () => {
       await createSession(
-        "3fa85f64-5717-4562-123c-2c963f66a2a1",
+        '3fa85f64-5717-4562-123c-2c963f66a2a1',
         sessionId,
         5,
         26,
         22
       );
 
-      const {status, body } = await request(app).get(
+      const { status, body } = await request(app).get(
         `/courses/${courseId}/sessions/${sessionId}`
       );
 
@@ -203,7 +205,7 @@ describe('/courses', () => {
 
       it('when sessionId is invalid', async () => {
         const payload = {
-          sessionId: "invalid",
+          sessionId: 'invalid',
           averageScore: 2,
           timeStudied: 3,
         };
@@ -218,6 +220,8 @@ describe('/courses', () => {
     });
 
     it('should return 201 and create a new session for course', async () => {
+      await createCourse("testCourse");
+
       const payload = {
         sessionId: sessionId,
         totalModulesStudied: 1,
@@ -225,9 +229,31 @@ describe('/courses', () => {
         timeStudied: 3,
       };
 
-      const { status } = await request(app).post(`/courses/${courseId}`).send(payload);
+      const { status } = await request(app)
+        .post(`/courses/${courseId}`)
+        .send(payload);
 
       expect(status).toEqual(201);
+    });
+  });
+
+  describe('POST /', () => {
+    it('should return status 400 when name is missing', async () => {
+      const { status, body } = await request(app).post(`/courses`).send({});
+
+      expect(status).toEqual(400);
+      expect(body.detail).toEqual('Missing required data');
+    });
+
+    it('should return status 400 when name is missing', async () => {
+      const payload = {
+        name: 'test',
+      };
+
+      const { status, body } = await request(app).post(`/courses`).send(payload);
+
+      expect(status).toEqual(201);
+      expect(body.detail).toEqual('Saved!');
     });
   });
 });
