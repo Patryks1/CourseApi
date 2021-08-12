@@ -2,7 +2,7 @@ version: '2'
 services:
   coursesapi:
     container_name: coursesapi
-    build: .
+    image: patryks1371/courseapp
     restart: always
     ports:
       - '8000:8000'
