@@ -13,9 +13,7 @@ router.post('/', async (req, res) => {
       detail: dictionary.missingRequiredData,
     });
   }
-
-  // TODO: Check if course name already exists
-
+  
   const courseDocument = new Course({
     name: name,
   });
@@ -76,7 +74,7 @@ router.post('/:courseId', async (req, res) => {
       });
     })
     .catch((err) => {
-      // Duplicate uuid error code
+      // Duplicate id error code
       if (err.code === 11000) {
         return res.status(409).json({
           detail: dictionary.recordAlreadyExists,
